@@ -37,10 +37,12 @@ describe('elements/content-sidebar/activity-feed/annotation-thread/AnnotationThr
                 getAvatarUrlWithAccessToken: mockGetAvatarUrlWithAccessToken,
             }),
         },
-        fileId: 'fileId',
-        filePermissions: {
-            can_view_annotations: true,
-            can_annotate: true,
+        file: {
+            id: 'fileId',
+            permissions: {
+                can_view_annotations: true,
+                can_annotate: true,
+            },
         },
     };
 

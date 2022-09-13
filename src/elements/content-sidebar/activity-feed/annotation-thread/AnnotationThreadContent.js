@@ -7,7 +7,7 @@ import API from '../../../../api/APIFactory';
 import LoadingIndicator from '../../../../components/loading-indicator/LoadingIndicator';
 import useAnnotationAPI from './useAnnotationAPI';
 
-import type { BoxItemPermission, SelectorItems } from '../../../../common/types/core';
+import type { BoxItem, SelectorItems } from '../../../../common/types/core';
 import type { ElementOrigin, ElementsXhrError } from '../../../../common/types/api';
 
 import './AnnotationThreadContent.scss';
@@ -15,40 +15,32 @@ import './AnnotationThreadContent.scss';
 type Props = {
     annotationId: string,
     api: API,
-    fileId: string,
-    filePermissions: BoxItemPermission,
+    file: BoxItem,
+    getMentionWithQuery: (searchStr: string) => void,
+    mentionSelectorContacts: SelectorItems<>,
     onError: (error: ElementsXhrError | Error, code: string, contextInfo?: Object, origin?: ElementOrigin) => void,
 };
 
-const AnnotationThreadContent = ({ annotationId, api, fileId, filePermissions, onError }: Props) => {
-    const [mentionSelectorContacts, setMentionSelectorContacts] = React.useState([]);
+const AnnotationThreadContent = ({
+    annotationId,
+    api,
+    file,
+    getMentionWithQuery,
+    mentionSelectorContacts,
+    onError,
+}: Props) => {
+    const { id: fileId, permissions = {} } = file;
 
     const { annotation, isLoading, error, handleEdit, handleStatusChange, handleDelete } = useAnnotationAPI({
         api,
-        fileId,
         annotationId,
-        filePermissions,
+        fileId,
+        filePermissions: permissions,
         errorCallback: onError,
     });
 
-    /**
-     * File @mention contacts fetch success callback
-     *
-     * @private
-     * @param {BoxItemCollection} collaborators - Collaborators response data
-     * @return {void}
-     */
-    const getMentionContactsSuccessCallback = ({ entries }: { entries: SelectorItems<> }): void => {
-        setMentionSelectorContacts(entries);
-    };
-
-    const getMentions = (searchStr: string) =>
-        api
-            .getFileCollaboratorsAPI(false)
-            .getCollaboratorsWithQuery(fileId, getMentionContactsSuccessCallback, onError, searchStr);
-
     const getAvatarUrl = async (userId: string): Promise<?string> => {
-        return api.getUsersAPI(false).getAvatarUrlWithAccessToken(userId, fileId);
+        return api.getUsersAPI(false).getAvatarUrlWithAccessToken(userId, file.id);
     };
 
     return (
@@ -64,7 +56,7 @@ const AnnotationThreadContent = ({ annotationId, api, fileId, filePermissions, o
                     getAvatarUrl={getAvatarUrl}
                     isCurrentVersion
                     item={annotation}
-                    getMentionWithQuery={getMentions}
+                    getMentionWithQuery={getMentionWithQuery}
                     mentionSelectorContacts={mentionSelectorContacts}
                     onEdit={handleEdit}
                     onDelete={handleDelete}

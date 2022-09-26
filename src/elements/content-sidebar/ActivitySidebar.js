@@ -53,7 +53,7 @@ import type { ErrorContextProps, ElementsXhrError } from '../../common/types/api
 import type { WithLoggerProps } from '../../common/types/logging';
 import type { SelectorItems, User, UserMini, GroupMini, BoxItem } from '../../common/types/core';
 import type { Errors, GetProfileUrlCallback } from '../common/flowTypes';
-import type { Translations, Collaborators } from './flowTypes';
+import type { Translations } from './flowTypes';
 import type { FeatureConfig } from '../common/feature-checking';
 import './ActivitySidebar.scss';
 
@@ -661,35 +661,6 @@ class ActivitySidebar extends React.PureComponent<Props, State> {
             searchStr,
         );
     }, DEFAULT_COLLAB_DEBOUNCE);
-
-    /**
-     * Fetches file collaborators
-     *
-     * @param {Function} successCallback - the success callback
-     * @param {Function} errorCallback - the error callback
-     * @param {string} searchStr - the search string
-     * @param {Object} [options]
-     * @param {boolean} [options.includeGroups] - return groups as well as users
-     * @return {void}
-     */
-    getCollaborators(
-        successCallback: Collaborators => void,
-        errorCallback: ElementsErrorCallback,
-        searchStr: string,
-        { includeGroups = false }: { includeGroups: boolean } = {},
-    ): void {
-        // Do not fetch without filter
-        const { api, file } = this.props;
-        if (!searchStr || searchStr.trim() === '') {
-            return;
-        }
-
-        api.getFileCollaboratorsAPI(true).getFileCollaborators(file.id, successCallback, errorCallback, {
-            filter_term: searchStr,
-            include_groups: includeGroups,
-            include_uploader_collabs: false,
-        });
-    }
 
     /**
      * Gets the user avatar URL
